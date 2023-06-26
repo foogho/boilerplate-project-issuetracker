@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const expect = require('chai').expect;
 const cors = require('cors');
 require('dotenv').config();
+const { Error } = require('mongoose');
 
 const apiRoutes = require('./routes/api.js');
 const fccTestingRoutes = require('./routes/fcctesting.js');
@@ -17,7 +18,7 @@ let app = express();
 app.use(cors({ origin: '*' })); //For FCC testing purposes only
 
 connectDB().then(() => {
-  console.log("connected to db successfully!")
+  console.log('connected to db successfully!');
   app.use('/public', express.static(process.cwd() + '/public'));
 
   app.use(bodyParser.json());
@@ -42,6 +43,16 @@ connectDB().then(() => {
   //404 Not Found Middleware
   app.use(function (req, res, next) {
     res.status(404).type('text').send('Not Found');
+  });
+
+  // global error handler
+  app.use((err, req, res, next) => {
+    // mongoose validation error
+    if (err instanceof Error.ValidationError) {
+      res.status(400).json({
+        error: 'required field(s) missing',
+      });
+    }
   });
 
   //Start our server and tests!
