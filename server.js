@@ -5,19 +5,21 @@ const bodyParser = require('body-parser');
 const expect = require('chai').expect;
 const cors = require('cors');
 require('dotenv').config();
-const { Error } = require('mongoose');
+const mongoose = require('mongoose');
 
 const apiRoutes = require('./routes/api.js');
 const fccTestingRoutes = require('./routes/fcctesting.js');
 const runner = require('./test-runner');
 
-const connectDB = require('./database.js');
-
 let app = express();
 
 app.use(cors({ origin: '*' })); //For FCC testing purposes only
 
-connectDB().then(() => {
+let MONGO_URI = process.env.MONGO_URI;
+if (process.env.NODE_ENV === 'test') {
+  MONGO_URI = process.env.TEST_MONGO_URI;
+}
+mongoose.connect(MONGO_URI).then(() => {
   console.log('connected to db successfully!');
   app.use('/public', express.static(process.cwd() + '/public'));
 
@@ -48,7 +50,7 @@ connectDB().then(() => {
   // global error handler
   app.use((err, req, res, next) => {
     // mongoose validation error
-    if (err instanceof Error.ValidationError) {
+    if (err instanceof mongoose.Error.ValidationError) {
       res.status(400).json({
         error: 'required field(s) missing',
       });
