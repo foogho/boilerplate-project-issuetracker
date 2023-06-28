@@ -23,7 +23,10 @@ module.exports = function (app) {
     })
     .get(async function (req, res, next) {
       try {
-        const issues = (await req.project.populate('issues')).issues;
+        const filters = req.query;
+        const issues = (
+          await req.project.populate({ path: 'issues', match: filters })
+        ).issues;
         res.json(issues);
       } catch (error) {
         next(error);
@@ -36,7 +39,7 @@ module.exports = function (app) {
         await issue.save();
         req.project.issues.push(issue);
         await req.project.save();
-        res.status(201).json(issue)
+        res.status(201).json(issue);
       } catch (error) {
         next(error);
       }
