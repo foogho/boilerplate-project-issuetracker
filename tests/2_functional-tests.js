@@ -200,6 +200,7 @@ suite('Functional Tests', function () {
   test('Update an issue with an invalid _id: PUT request to /api/issues/{project}', async () => {
     const badIssue = {
       _id: 'dummy id',
+      issue_title: 'dummy title',
     };
     const res = await requester
       .put('/api/issues/functional-test-project')
