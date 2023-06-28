@@ -45,8 +45,41 @@ module.exports = function (app) {
       }
     })
 
-    .put(function (req, res) {
-      let project = req.params.project;
+    .put(async function (req, res, next) {
+      try {
+        if (!req.body._id) {
+          return res.status(400).json({
+            error: 'missing _id',
+          });
+        }
+        // return if request body contains only _id field
+        if (Object.keys(req.body).length === 1) {
+          return res.status(201).json({
+            error: 'no update field(s) sent',
+            _id: req.body._id,
+          });
+        }
+        let issueToUpdate;
+        // invalid _id inputs or _id inputs with no result will make
+        // following block to throw exception. for catching only this exception
+        // and respond to the client I wrote another try/catch
+        try {
+          issueToUpdate = await Issue.findById(req.body._id).orFail();
+        } catch (error) {
+          res.status(400).json({
+            error: 'could not update',
+            _id: req.body._id,
+          });
+        }
+        Object.assign(issueToUpdate, req.body);
+        await issueToUpdate.save();
+        res.status(201).json({
+          result: 'successfully updated',
+          _id: req.body._id,
+        });
+      } catch (error) {
+        next(error);
+      }
     })
 
     .delete(function (req, res) {
