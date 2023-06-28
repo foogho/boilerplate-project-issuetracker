@@ -55,6 +55,7 @@ mongoose.connect(MONGO_URI).then(() => {
         error: 'required field(s) missing',
       });
     }
+    next(err);
   });
 
   //Start our server and tests!
