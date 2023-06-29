@@ -82,7 +82,25 @@ module.exports = function (app) {
       }
     })
 
-    .delete(function (req, res) {
-      let project = req.params.project;
+    .delete(async function (req, res, next) {
+      try {
+        if (!req.body._id) {
+          res.status(400).json({ error: 'missing _id' });
+        }
+        await Issue.deleteOne({ _id: req.body._id });
+        res.status(201).json({
+          result: 'successfully deleted',
+          _id: req.body._id,
+        });
+      } catch (error) {
+        // catching exceptions related to casting _id
+        if (error.name === 'CastError') {
+          return res.status(400).json({
+            error: 'could not delete',
+            _id: req.body._id,
+          });
+        }
+        next(error);
+      }
     });
 };
