@@ -1,5 +1,14 @@
 'use strict';
 
+// configure jquery ajax global events to show/hide loading spinner
+$(document)
+  .on('ajaxStart', () => {
+    $('#loadingSpinner').removeClass("d-none");
+  })
+  .on('ajaxStop', () => {
+    $('#loadingSpinner').addClass("d-none");
+  });
+
 // configure jquery ajax to show request responses and errors in toasts
 $.ajaxSetup({
   success: (res) => {
@@ -26,6 +35,9 @@ let viewedIssue;
 
 $(document).ready(function () {
   projectTitle = getProjectTitle();
+  $.ajaxSetup({
+    url: `/api/issues/${projectTitle}`,
+  });
   renderProjectTitle();
   renderIssues();
   $('#createIssueModal').find('form').on('submit', onCreateOrModifyIssueSubmit);
@@ -50,9 +62,7 @@ function renderProjectTitle() {
 
 function renderIssues() {
   $.ajax({
-    url: `/api/issues/${projectTitle}`,
     success: function (issues) {
-      $('#loadingSpinner').remove();
       fetchedIssues = issues;
       if (issues.length === 0) {
         $('#issueEmptyListTemplate').removeClass('d-none');
@@ -81,7 +91,6 @@ function onCreateOrModifyIssueSubmit(event) {
   event.preventDefault();
   const formData = extractFormDataAsJSON($(this));
   $.ajax({
-    url: `/api/issues/${projectTitle}`,
     method: event.target.id === 'createIssueForm' ? 'POST' : 'PUT',
     data: formData,
   });
@@ -103,7 +112,6 @@ function setViewedIssueToForm() {
 function deleteIssue() {
   confirm('are you sure?')
     ? $.ajax({
-        url: `/api/issues/${projectTitle}`,
         method: 'DELETE',
         data: {
           _id: viewedIssue._id,
