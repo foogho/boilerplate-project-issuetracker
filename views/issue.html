@@ -1,106 +1,148 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Issue Tracker - Project Page</title>
-    <link rel="icon" type="image/png" href="https://cdn.freecodecamp.org/universal/favicons/favicon-16x16.png" />
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/public/style.css">
-  </head>
-  <body>
-    <header>
-      <h1 id='projectTitle'></h1>
-    </header>
-    <center>
-      <div id='submitNewIssue'>
-        <br>
-        <h3>Submit a new issue:</h3>
-        <form id="newIssue" method="post" action="/api/">
-          <input type="text" name="issue_title" placeholder="*Title" style="width: 320px; margin-bottom: 3px;" required=''><br>
-          <textarea type="text" name="issue_text" placeholder="*Text" style="width: 320px; height: 100px;" required=''></textarea><br>
-          <input type="text" name="created_by" placeholder="*Created by" style="width: 100px" required=''>
-          <input type="text" name="assigned_to" placeholder="(opt)Assigned to" style="width: 100px">
-          <input type="text" name="status_text" placeholder="(opt)Status text" style="width: 100px"><br>
-          <button type="submit">Submit Issue</button>
+
+<head>
+  <title>Issue Tracker</title>
+  <link rel="icon" type="image/png" href="https://cdn.freecodecamp.org/universal/favicons/favicon-16x16.png" />
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+</head>
+
+<body>
+  <nav class="navbar navbar-expand bg-body-tertiary">
+    <div class="container-fluid">
+      <div class="d-flex">
+        <a class="navbar-brand" href="#">Issue Tracker</a>
+        <div class="navbar-nav"><a href="/" class="nav-link">Home</a>
+        </div>
+      </div>
+      <a target="_blank" href="https://github.com/foogho/boilerplate-project-issuetracker" class="nav-link">
+        <img src="/public/assets/github-mark.svg" alt="github logo" width="30px">
+      </a>
+    </div>
+  </nav>
+  <div class="container">
+    <div class="row row-cols-1 g-3 text-center p-4">
+      <h1 class="display-6" id="projectTitle">apitest project</h1>
+      <div class="spinner-border mx-auto mt-5" role="status" id="loadingSpinner">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <div class="alert alert-light mt-5 d-none" role="alert" id="issueEmptyListTemplate">
+        <p class="lead">create first issue for this project</p>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createIssueModal">New
+          Issue</button>
+      </div>
+      <table class="table table-striped table-responsive d-none" id="issueTable">
+        <caption class="caption-top">
+          <div class="row justify-content-between">
+            <div class="col-auto">List Of Issues</div>
+            <div class="col-auto"><button class="btn btn-primary" data-bs-toggle="modal"
+                data-bs-target="#createIssueModal">New
+                Issue</button></div>
+          </div>
+        </caption>
+        <thead>
+          <th>#</th>
+          <th>Id</th>
+          <th>Title</th>
+          <th>Creator</th>
+          <th>State</th>
+          <th>Action</th>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="modal fade" id="createIssueModal" tabindex="-1" aria-labelledby="issueModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <form>
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="issueModalLabel">New Issue</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="container">
+              <div class="row row-cols-sm-2 gy-4">
+                <div><label for="issueTitle" class="form-label">Title</label><input id="issueTitle" type="text"
+                    class="form-control" name="issue_title"></div>
+                <div><label for="issueText" class="form-label">Text</label><textarea type="text" class="form-control"
+                    id="issueText" name="issue_text"></textarea>
+                </div>
+                <div><label for="createdBy" class="form-label">Created By</label><input name="created_by" id="createdBy"
+                    type="text" class="form-control"></div>
+                <div><label for="assignedTo" class="form-label">Assigned To</label><input name="assigned_to"
+                    id="assignedTo" type="text" class="form-control"></div>
+                <div><label for="statusText" class="form-label">Status Text</label><input id="statusText"
+                    name="status_text" type="text" class="form-control"></div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary" id="saveIssueBtn">Save</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="modal fade" id="modifyIssueModal" tabindex="-1" aria-labelledby="issueModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form>
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="issueModalLabel">Modify Issue</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="container">
+              <div class="row row-cols-sm-2 gy-4">
+                <div><label for="issueId" class="form-label">Id</label><input id="issueId" type="text"
+                    class="form-control" name="_id"></div>
+                <div><label for="issueTitle" class="form-label">Title</label><input id="issueTitle" type="text"
+                    class="form-control" name="issue_title"></div>
+                <div><label for="issueText" class="form-label">Text</label><textarea type="text" class="form-control"
+                    id="issueText" name="issue_text"></textarea>
+                </div>
+                <div><label for="createdBy" class="form-label">Created By</label><input name="created_by" id="createdBy"
+                    type="text" class="form-control"></div>
+                <div><label for="assignedTo" class="form-label">Assigned To</label><input name="assigned_to"
+                    id="assignedTo" type="text" class="form-control"></div>
+                <div><label for="statusText" class="form-label">Status Text</label><input id="statusText"
+                    name="status_text" type="text" class="form-control"></div>
+                <div class="form-check"><input name="open" value="false" type="hidden" /><input name="open" value="true"
+                    type="checkbox" class="form-check-input" id="issueIsOpen"><label class="form-check-label"
+                    for="issueIsOpen">Open</label></div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary" id="saveIssueBtn">Update</button>
+            <button type="button" class="btn btn-danger" id="deleteIssueBtn">Delete</button>
+          </div>
         </form>
       </div>
-      
-      <div id='issueDisplay'></div>
-      
-      <hr style='margin: 50px; margin-top: 200px'>
-    </center>
-    
-    <script src="https://code.jquery.com/jquery-2.2.1.min.js"
-            integrity="sha256-gvQgAFzTH6trSrAWoH1iPo9Xc96QxSZ3feW6kem+O00="
-            crossorigin="anonymous"></script>
-    <script>
-      $(function() {
-        let currentProject = window.location.pathname.replace(/\//g, "");;
-        let url = "/api/issues/"+currentProject;
-        $('#projectTitle').text('All issues for: '+currentProject)
-        $.ajax({
-          type: "GET",
-          url: url,
-          success: function(data)
-          {
-            let issues= [];
-            data.forEach(function(ele) {
-              console.log(ele);
-              let openstatus;
-              (ele.open) ? openstatus = 'open' : openstatus = 'closed';
-              let single = [
-                '<div class="issue '+openstatus+'">',
-                '<p class="id">id: '+ele._id+'</p>',
-                '<h3>'+ele.issue_title+' -  ('+openstatus+')</h3>',
-                '<br>',
-                '<p>'+ele.issue_text+'</p>',
-                '<p>'+ele.status_text+'</p>',
-                '<br>',
-                '<p class="id"><b>Created by:</b> '+ele.created_by+'  <b>Assigned to:</b> '+ele.assigned_to,
-                '<p class="id"><b>Created on:</b> '+ele.created_on+'  <b>Last updated:</b> '+ele.updated_on,
-                '<br><a href="#" class="closeIssue" id="'+ele._id+'">close?</a> <a href="#" class="deleteIssue" id="'+ele._id+'">delete?</a>',
-                '</div>'
-                
-              ];
-              issues.push(single.join(''));
-            });
-            $('#issueDisplay').html(issues.join(''));
-          }
-        });
-        
-        $('#newIssue').submit(function(e){
-          e.preventDefault();
-          $(this).attr('action', "/api/issues/" + currentProject);
-          $.ajax({
-            type: "POST",
-            url: url,
-            data: $(this).serialize(),
-            success: function(data) { window.location.reload(true); }
-          });
-        });
-        
-        $('#issueDisplay').on('click','.closeIssue', function(e) {
-          let url = "/api/issues/"+currentProject;
-          $.ajax({
-            type: "PUT",
-            url: url,
-            data: {_id: $(this).attr('id'), open: false},
-            success: function(data) { alert(data); window.location.reload(true); }
-          });
-          e.preventDefault();
-        });
-        $('#issueDisplay').on('click','.deleteIssue', function(e) {
-          let url = "/api/issues/"+currentProject;
-          $.ajax({
-            type: "DELETE",
-            url: url,
-            data: {_id: $(this).attr('id')},
-            success: function(data) { alert(data); window.location.reload(true); }
-          });
-          e.preventDefault();
-        });
-      });
-   </script>
-  </body>
+    </div>
+  </div>
+  <div class="toast-container position-fixed top-0 end-0 p-3">
+    <div class="toast" id="AJAXResultToast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <strong class="me-auto">Result</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+      <div class="toast-body">
+      </div>
+    </div>
+  </div>
+  <script src="https://code.jquery.com/jquery-2.2.1.min.js"
+    integrity="sha256-gvQgAFzTH6trSrAWoH1iPo9Xc96QxSZ3feW6kem+O00=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"
+    integrity="sha384-fbbOQedDUMZZ5KreZpsbe1LCZPVmfTnH7ois6mU1QK+m14rQ1l2bGBq41eYeM/fS"
+    crossorigin="anonymous"></script>
+  <script src="/public/issue.js"></script>
+</body>
+
 </html>
