@@ -1,33 +1,31 @@
 'use strict';
 
-// configure jquery ajax global events to show/hide loading spinner
+// configure jquery ajax global events to show/hide loading spinner , toasts
 $(document)
   .on('ajaxStart', () => {
-    $('#loadingSpinner').removeClass("d-none");
+    $('#loadingSpinner').removeClass('d-none');
   })
   .on('ajaxStop', () => {
-    $('#loadingSpinner').addClass("d-none");
+    $('#loadingSpinner').addClass('d-none');
+  })
+  .on('ajaxSuccess', (_, { responseJSON: res }, request) => {
+    if (request.type !== 'GET') {
+      renderAJAXResult(res.result, true);
+    }
+  })
+  .on('ajaxError', (_, { responseJSON: res }) => {
+    renderAJAXResult(res.error, false);
   });
 
-// configure jquery ajax to show request responses and errors in toasts
-$.ajaxSetup({
-  success: (res) => {
-    const toastEl = $('#AJAXResultToast');
-    toastEl
-      .addClass('text-bg-success')
-      .find('.toast-body')
-      .text(res.result ? res.result : 'request completed successfully');
-    bootstrap.Toast.getOrCreateInstance(toastEl).show();
-  },
-  error: (err) => {
-    const toastEl = $('#AJAXResultToast');
-    toastEl
-      .addClass('text-bg-danger')
-      .find('.toast-body')
-      .text(err.responseJSON.error);
-    bootstrap.Toast.getOrCreateInstance(toastEl).show();
-  },
-});
+function renderAJAXResult(content, isSuccessfull) {
+  let cssClass = isSuccessfull ? 'text-bg-success' : 'text-bg-danger';
+  const toastEl = $('#toast');
+  toastEl.addClass(cssClass).find('.toast-body').text(content);
+  bootstrap.Toast.getOrCreateInstance(toastEl).show();
+  toastEl.on('hide.bs.toast', () => {
+    toastEl.removeClass(cssClass);
+  });
+}
 
 let fetchedIssues;
 let projectTitle;
