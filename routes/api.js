@@ -48,7 +48,7 @@ module.exports = function (app) {
     .put(async function (req, res, next) {
       try {
         if (!req.body._id) {
-          return res.status(400).json({
+          return res.status(200).json({
             error: 'missing _id',
           });
         }
@@ -66,7 +66,7 @@ module.exports = function (app) {
         try {
           issueToUpdate = await Issue.findById(req.body._id).orFail();
         } catch (error) {
-          res.status(400).json({
+          res.status(200).json({
             error: 'could not update',
             _id: req.body._id,
           });
@@ -85,7 +85,7 @@ module.exports = function (app) {
     .delete(async function (req, res, next) {
       try {
         if (!req.body._id) {
-          res.status(400).json({ error: 'missing _id' });
+          res.status(200).json({ error: 'missing _id' });
         }
         await Issue.deleteOne({ _id: req.body._id });
         res.status(201).json({
@@ -95,7 +95,7 @@ module.exports = function (app) {
       } catch (error) {
         // catching exceptions related to casting _id
         if (error.name === 'CastError') {
-          return res.status(400).json({
+          return res.status(200).json({
             error: 'could not delete',
             _id: req.body._id,
           });

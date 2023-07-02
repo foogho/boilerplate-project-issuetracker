@@ -51,7 +51,7 @@ mongoose.connect(MONGO_URI).then(() => {
   app.use((err, req, res, next) => {
     // mongoose validation error
     if (err instanceof mongoose.Error.ValidationError) {
-      res.status(400).json({
+      res.status(200).json({
         error: 'required field(s) missing',
       });
     }

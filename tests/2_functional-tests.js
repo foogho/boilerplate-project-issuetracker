@@ -74,7 +74,7 @@ suite('Functional Tests', function () {
     const res = await requester
       .post('/api/issues/functional-test-project')
       .send(badIssue);
-    assert.equal(res.status, 400, 'appropriate status code should be returned');
+    assert.equal(res.status, 200, 'appropriate status code should be returned');
     assert.equal(
       res.body.error,
       'required field(s) missing',
@@ -169,7 +169,7 @@ suite('Functional Tests', function () {
       .send(badIssue);
     assert.equal(
       res.status,
-      400,
+      200,
       'appropriate error status should be returned'
     );
     assert.equal(
@@ -207,7 +207,7 @@ suite('Functional Tests', function () {
       .send(badIssue);
     assert.equal(
       res.status,
-      400,
+      200,
       'appropriate error status should be returned'
     );
     assert.equal(
@@ -248,7 +248,7 @@ suite('Functional Tests', function () {
       .send(badIssue);
     assert.equal(
       res.status,
-      400,
+      200,
       'should respond with appropriate status code'
     );
     assert.deepEqual(
@@ -268,7 +268,7 @@ suite('Functional Tests', function () {
       .send(badIssue);
     assert.equal(
       res.status,
-      400,
+      200,
       'should response with appropriate status code'
     );
     assert.equal(
