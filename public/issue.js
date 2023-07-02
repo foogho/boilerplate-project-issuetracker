@@ -11,6 +11,10 @@ $(document)
   .on('ajaxSuccess', (_, { responseJSON: res }, request) => {
     if (request.type !== 'GET') {
       renderAJAXResult(res.result, true);
+      // in order to show user the changes, modal should be closed and
+      // list should be updated
+      findAndCloseOpenModal();
+      renderIssues();
     }
   })
   .on('ajaxError', (_, { responseJSON: res }) => {
@@ -25,6 +29,18 @@ function renderAJAXResult(content, isSuccessfull) {
   toastEl.on('hide.bs.toast', () => {
     toastEl.removeClass(cssClass);
   });
+}
+
+function findAndCloseOpenModal() {
+  let modalInstance;
+  const modalElements = $("[id*='modal'],[id*='Modal'");
+  for (let modalEl of modalElements) {
+    modalInstance = bootstrap.Modal.getInstance(modalEl);
+    if (modalInstance) {
+      break;
+    }
+  }
+  modalInstance.hide();
 }
 
 let fetchedIssues;
@@ -91,6 +107,7 @@ function onCreateOrModifyIssueSubmit(event) {
   $.ajax({
     method: event.target.id === 'createIssueForm' ? 'POST' : 'PUT',
     data: formData,
+    success: () => {},
   });
 }
 
