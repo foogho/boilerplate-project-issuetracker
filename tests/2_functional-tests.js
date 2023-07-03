@@ -2,6 +2,7 @@ const chaiHttp = require('chai-http');
 const chai = require('chai');
 const assert = chai.assert;
 const server = require('../server');
+const ObjectId = require("mongoose").Types.ObjectId
 
 const Issue = require('../models/issue');
 const Project = require('../models/project');
@@ -241,7 +242,7 @@ suite('Functional Tests', function () {
 
   test('Delete an issue with an invalid _id: DELETE request to /api/issues/{project}', async () => {
     const badIssue = {
-      _id: 'dummy id',
+      _id: new ObjectId(),
     };
     const res = await requester
       .delete('/api/issues/functional-test-project')
@@ -255,7 +256,7 @@ suite('Functional Tests', function () {
       res.body,
       {
         error: 'could not delete',
-        _id: badIssue._id,
+        _id: badIssue._id.toString(),
       },
       'error should contain appropriate message and issue id'
     );

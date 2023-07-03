@@ -87,19 +87,21 @@ module.exports = function (app) {
         if (!req.body._id) {
           res.status(200).json({ error: 'missing _id' });
         }
-        await Issue.deleteOne({ _id: req.body._id });
-        res.status(201).json({
-          result: 'successfully deleted',
-          _id: req.body._id,
-        });
-      } catch (error) {
-        // catching exceptions related to casting _id
-        if (error.name === 'CastError') {
+        try {
+          // whether the id is invalid or there's no document related to that
+          // following catch block will be executed
+          await Issue.findById(req.body._id).orFail().deleteOne();
+        } catch (error) {
           return res.status(200).json({
             error: 'could not delete',
             _id: req.body._id,
           });
         }
+        res.status(201).json({
+          result: 'successfully deleted',
+          _id: req.body._id,
+        });
+      } catch (error) {
         next(error);
       }
     });
